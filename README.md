@@ -25,3 +25,6 @@ python test_model.py
   markdown id="5mql4l"
 ## Team Members
 - Mashaim hanif
+
+## Team Member
+- Fiza Rashid
