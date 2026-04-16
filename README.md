@@ -21,4 +21,7 @@ python test_model.py
 - Train noise classifier
 - Predict noisy/clean traces
 - Explain predictions using SHAP
-- Explain working of models 
+- Explain working of models
+  markdown id="5mql4l"
+## Team Members
+- Mashaim hanif
