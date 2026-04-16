@@ -1,45 +1,77 @@
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
 
 
 def extract_features(traces):
     """
-    Extract statistical features from seismic traces.
+    Extract 6 statistical features from each seismic trace.
     """
-    mean_amp = np.mean(traces, axis=1)
-    std_amp = np.std(traces, axis=1)
-    max_amp = np.max(traces, axis=1)
-    min_amp = np.min(traces, axis=1)
-    energy = np.sum(traces**2, axis=1)
+    if traces.ndim != 2:
+        raise ValueError(f"Expected 2D array, got {traces.ndim}D")
 
-    features = np.column_stack([
-        mean_amp,
-        std_amp,
-        max_amp,
-        min_amp,
-        energy
-    ])
+    out = []
 
-    return features
+    for tr in traces:
+        tr = tr.astype(float)
+
+        std = float(tr.std())
+
+        kurtosis = float(
+            (((tr - tr.mean()) / std) ** 4).mean()
+        ) if std > 0 else 0.0
+
+        out.append([
+            float(abs(tr).mean()),
+            std,
+            float(abs(tr).max()),
+            float((tr ** 2).sum()),
+            float((np.diff(np.sign(tr)) != 0).sum()),
+            kurtosis
+        ])
+
+    return np.array(out)
 
 
-def train_classifier(X, y):
+def train_classifier(traces, labels):
     """
     Train Random Forest classifier.
     """
-    model = RandomForestClassifier(
+    if len(traces) != len(labels):
+        raise ValueError("traces and labels length mismatch")
+
+    features = extract_features(traces)
+
+    clf = RandomForestClassifier(
         n_estimators=100,
         random_state=42
     )
 
-    model.fit(X, y)
+    clf.fit(features, labels)
 
-    return model
+    report = classification_report(
+        labels,
+        clf.predict(features),
+        zero_division=0
+    )
+
+    return {
+        "model": clf,
+        "classes": list(clf.classes_),
+        "report": report
+    }
 
 
-def predict_traces(model, X):
+def predict_traces(traces, model_dict):
     """
-    Predict noisy/clean traces.
+    Predict labels for traces.
     """
-    return model.predict(X)
+    clf = model_dict["model"]
+
+    features = extract_features(traces)
+
+    preds = clf.predict(features)
+    probs = clf.predict_proba(features)
+
+    return preds, probs

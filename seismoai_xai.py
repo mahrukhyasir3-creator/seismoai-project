@@ -1,10 +1,12 @@
 
 import shap
 import matplotlib.pyplot as plt
-import numpy as np
 
 
 def compute_shap_values(model, X_train, X_sample):
+    """
+    Compute SHAP values.
+    """
     explainer = shap.Explainer(model, X_train)
     shap_values = explainer(X_sample)
     return shap_values
@@ -12,7 +14,7 @@ def compute_shap_values(model, X_train, X_sample):
 
 def plot_feature_importance(shap_values):
     """
-    Plot SHAP feature importance safely.
+    Plot SHAP feature importance.
     """
     try:
         shap.plots.bar(shap_values[:, :, 1], max_display=10)
@@ -23,7 +25,10 @@ def plot_feature_importance(shap_values):
 
 
 def explain_prediction(prediction):
-    if prediction == 1:
-        return "Predicted as NOISY trace due to abnormal seismic feature patterns."
+    """
+    Explain model prediction.
+    """
+    if prediction == 'noisy':
+        return "Trace predicted as NOISY due to abnormal seismic statistics."
     else:
-        return "Predicted as CLEAN trace due to normal seismic feature behavior."
+        return "Trace predicted as GOOD due to normal seismic behavior."
