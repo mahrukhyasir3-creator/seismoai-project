@@ -24,6 +24,9 @@ python test_model.py
 - Explain working of models
   markdown id="5mql4l"
 ## Team Members
+- Asif Ali Durrani 
+  
+## Team Members
 - Mashaim hanif
 
 ## Team Member
